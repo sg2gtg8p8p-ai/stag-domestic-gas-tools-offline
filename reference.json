@@ -1,0 +1,21 @@
+{
+  "version": "approved-20261009-622952a27038",
+  "sourceSHA256": "622952a270383e70674257a9bf3489378c7322bbc8aa6249669b92f41cb53e6d",
+  "approvedHTMLSHA256": "a7a95a35c001fbf9fb326054e52f232c2ea7a73301269a8da9c8c3929b555a3d",
+  "calculationSHA256": "766160e79f43e94ddcf8f94d039421b3f378ef559f0465884fede3eb4e987b06",
+  "sources": [
+    {
+      "reference": "BS 6891:2015 Annex A",
+      "scope": "Existing approved natural-gas copper pipe sizing implementation; not a newly verified edition"
+    },
+    {
+      "reference": "IGEM/UP/1B Edition 4",
+      "scope": "Existing approved tightness/purge implementation; controlled standard required"
+    },
+    {
+      "reference": "Approved Stag metric gas-rate implementation",
+      "scope": "CV 38.9 MJ/m³; existing gross/net conversion preserved"
+    }
+  ],
+  "warning": "Calculation aid. Verify against current controlled standards and appliance instructions. No engineering constants, thresholds or warnings have been revised."
+}
