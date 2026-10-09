@@ -29,10 +29,10 @@
    registration=await navigator.serviceWorker.register('sw.js',{scope:'./',updateViaCache:'none'});
    const waiting=()=>{$('update').hidden=!registration.waiting;};waiting();
    registration.addEventListener('updatefound',()=>{const worker=registration.installing;worker?.addEventListener('statechange',()=>{if(worker.state==='installed'){waiting();readiness();}});});
-   await navigator.serviceWorker.ready;await readiness();
+   await navigator.serviceWorker.ready;waiting();await readiness();
   }catch(e){block(e.message+' — reconnect and repair before using calculators.');}
  }
- navigator.serviceWorker?.addEventListener('controllerchange',()=>{if(reloading){location.reload();return;}readiness();});
+ navigator.serviceWorker?.addEventListener('controllerchange',()=>{$('update').hidden=!registration?.waiting;if(reloading){location.reload();return;}readiness();});
  navigator.serviceWorker?.addEventListener('message',e=>{if(e.data?.type==='INTEGRITY_FAILURE')block('Offline copy is incomplete or corrupt. Reconnect and repair before calculating.');});
  $('update').onclick=()=>{if(registration?.waiting&&confirm('Finish any timed test first. Finish timed tests in every app window. Applying the update reloads this app window and clears its unsaved inputs. Continue?')){reloading=true;registration.waiting.postMessage({type:'ACTIVATE'});}};
  $('repair').onclick=async()=>{
