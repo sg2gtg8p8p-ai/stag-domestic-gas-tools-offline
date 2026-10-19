@@ -2,7 +2,7 @@
   "version": "approved-20261009-622952a27038",
   "sourceSHA256": "622952a270383e70674257a9bf3489378c7322bbc8aa6249669b92f41cb53e6d",
   "approvedHTMLSHA256": "a7a95a35c001fbf9fb326054e52f232c2ea7a73301269a8da9c8c3929b555a3d",
-  "calculationSHA256": "766160e79f43e94ddcf8f94d039421b3f378ef559f0465884fede3eb4e987b06",
+  "calculationSHA256": "25715f0d649f750c59c6c1766cbe8a0228a11578e78724122d5c08e815c6203e",
   "sources": [
     {
       "reference": "BS 6891:2015 Annex A",
@@ -15,7 +15,14 @@
     {
       "reference": "Approved Stag metric gas-rate implementation",
       "scope": "CV 38.9 MJ/m³; existing gross/net conversion preserved"
+    },
+    {
+      "reference": "Worcester TB0105b(2016/03),p1",
+      "url": "https://www.worcester-bosch.co.uk/support/literature/download/TB%200105%20b",
+      "sourceSHA256": "12ac02fc222c3386b054c315c16f2c2b2dc4da67c591dab38e36e0c62178cad9",
+      "page": 1,
+      "scope": "Imperial natural mainsgas test-dial formula;1040Btu/ft³ average grossCV,3412Btu/h per grosskW,approximately1.11gross/net. Confirm actual timed test-dial volume. No billing correction, generic appliance tolerance or automatic pass/fail."
     }
   ],
-  "warning": "Calculation aid. Verify against current controlled standards and appliance instructions. No engineering constants, thresholds or warnings have been revised."
+  "warning": "Calculation aid. Existing pipe/tightness and metric38.9MJ/m³ arithmetic remain unchanged. Imperial mode uses WorcesterTB0105b average1040Btu/ft³ and source3412/1.11 divisors, with actual test-dial volume entered by the user. Verify suppliedCV/appliance instructions; no automatic pass/fail."
 }
