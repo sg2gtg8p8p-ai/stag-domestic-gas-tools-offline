@@ -4,3 +4,15 @@
 
 /* Approved full Option A branding; calculator presentation retained. */
 .branding-panel{width:300px;max-width:100%;height:auto;display:block;margin:0 auto 16px}.brand-header p{text-align:center;margin:auto}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Compact working screen. Storage and reference details remain in the closed Menu. */
+body{padding:12px 14px max(24px,env(safe-area-inset-bottom))!important}
+.brand-header{display:grid!important;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:12px;padding:0 0 18px!important;position:relative}
+.branding-panel{grid-column:1;width:64px!important;max-width:64px!important;height:64px!important;margin:0!important;display:block!important;border-radius:10px}
+.brand-header h1{font-size:20px!important;margin:0!important;grid-column:2;grid-row:1;line-height:1.2!important}.brand-header>p{grid-column:1/-1;font-size:11px!important;margin:0!important}
+.app-menu{grid-column:3;grid-row:1;position:relative}.app-menu>summary{padding:10px;border:1px solid #617d83;border-radius:8px;cursor:pointer;list-style:none;font-size:14px;font-weight:700;color:#56ddd0}
+.app-menu-panel{position:absolute;right:0;top:48px;z-index:40;width:min(88vw,350px);max-height:78vh;overflow:auto;padding:14px;background:#182225;border:1px solid #617d83;border-radius:12px;box-shadow:0 10px 35px #0008}
+.app-menu-panel>button{width:100%}.app-menu-panel .offline-status{margin:10px 0 0;padding:10px}.app-menu-panel #updateStatus{font-size:13px;line-height:1.4}.app-menu-panel #update{width:100%;margin-top:12px}
+.app-alert{border:1px solid #ac8c51;background:#30291c;color:#ffd390;border-radius:8px;padding:10px;font-size:13px}.app-alert[hidden]{display:none}
+.tabs{gap:8px;margin-bottom:16px}.tabs button{min-height:60px;padding:12px 8px;text-align:center}.tabs small{display:none}.tabs span{font-size:15px}
+@media(max-width:360px){.brand-header{grid-template-columns:54px minmax(0,1fr) auto;gap:8px}.branding-panel{width:54px!important;height:54px!important}.brand-header h1{font-size:17px!important}.app-menu>summary{font-size:12px}}

@@ -4,7 +4,7 @@
  let registration, verified=false, reloading=false;
  const $=id=>document.getElementById(id), tools=$('tools');
  const digest=async bytes=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(n=>n.toString(16).padStart(2,'0')).join('');
- const block=message=>{verified=false;tools.disabled=true;tools.inert=true;$('readiness').textContent=message;$('readiness').dataset.state='blocked';};
+ const block=message=>{verified=false;tools.disabled=true;tools.inert=true;$('readiness').textContent=message;$('readiness').dataset.state='blocked';$('appAlert').hidden=false;$('appAlert').textContent=message;};
  const connection=()=>{$('connection').textContent=navigator.onLine?'Online':'Offline';$('connection').dataset.offline=String(!navigator.onLine);};
  async function asset(name,expected){const r=await fetch(name,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('Offline file unavailable: '+name);const b=await r.arrayBuffer();if(await digest(b)!==expected)throw Error('Offline file failed integrity check: '+name);return b;}
  async function cacheHealth(){
@@ -24,10 +24,10 @@
    const reference=JSON.parse(new TextDecoder().decode(refs));if(reference.version!==VERSION||reference.calculationSHA256!==CALC_HASH)throw Error('Reference version mismatch');
    const script=document.createElement('script'),url=URL.createObjectURL(new Blob([bytes],{type:'application/javascript'}));script.src=url;
    await new Promise((resolve,reject)=>{script.onload=resolve;script.onerror=()=>reject(Error('Calculator could not start'));document.head.appendChild(script);});URL.revokeObjectURL(url);
-   verified=true;tools.disabled=false;tools.inert=false;
+   verified=true;tools.disabled=false;tools.inert=false;$('appAlert').hidden=true;
    if(!('serviceWorker' in navigator)||!window.isSecureContext){$('readiness').textContent='Offline installation unavailable: use Safari over HTTPS.';return;}
    registration=await navigator.serviceWorker.register('sw.js',{scope:'./',updateViaCache:'none'});
-   const waiting=()=>{$('update').hidden=!registration.waiting;};waiting();
+   const waiting=()=>{$('update').hidden=!registration.waiting;$('menuLabel').textContent=registration.waiting?'Menu · update ready':'Menu';};waiting();
    registration.addEventListener('updatefound',()=>{const worker=registration.installing;worker?.addEventListener('statechange',()=>{if(worker.state==='installed'){waiting();readiness();}});});
    await navigator.serviceWorker.ready;waiting();await readiness();
   }catch(e){block(e.message+' — reconnect and repair before using calculators.');}
@@ -35,6 +35,18 @@
  navigator.serviceWorker?.addEventListener('controllerchange',()=>{$('update').hidden=!registration?.waiting;if(reloading){location.reload();return;}readiness();});
  navigator.serviceWorker?.addEventListener('message',e=>{if(e.data?.type==='INTEGRITY_FAILURE')block('Offline copy is incomplete or corrupt. Reconnect and repair before calculating.');});
  $('update').onclick=()=>{if(registration?.waiting&&confirm('Finish any timed test first. Finish timed tests in every app window. Applying the update reloads this app window and clears its unsaved inputs. Continue?')){reloading=true;registration.waiting.postMessage({type:'ACTIVATE'});}};
+ $('checkUpdates').onclick=async()=>{
+  const button=$('checkUpdates'), status=$('updateStatus');button.disabled=true;status.textContent='Checking for updates…';
+  try{
+   if(!navigator.onLine)throw Error('Connect to check for updates.');
+   registration ||= await navigator.serviceWorker?.getRegistration();
+   if(!registration)throw Error('Open the app online, then try again.');
+   await registration.update();
+   if(registration.installing)await new Promise((resolve,reject)=>{const worker=registration.installing,timer=setTimeout(()=>reject(Error('Download is still in progress. Check again shortly.')),30000);const state=()=>{if(['installed','redundant'].includes(worker.state)){clearTimeout(timer);worker.state==='installed'?resolve():reject(Error('The update could not be verified. Try again when connected.'));}};worker.addEventListener('statechange',state);state();});
+   $('update').hidden=!registration.waiting;$('menuLabel').textContent=registration.waiting?'Menu · update ready':'Menu';
+   status.textContent=registration.waiting?'Update ready. Finish any timed tests before applying it.':"You’re up to date.";
+  }catch(error){status.textContent=error.message;}finally{button.disabled=false;}
+ };
  $('repair').onclick=async()=>{
   if(!navigator.onLine){block('Repair requires an internet connection. Reconnect, then check / repair.');return;}
   $('readiness').textContent='Verifying and repairing offline files…';
