@@ -1,6 +1,6 @@
 'use strict';
 (()=>{
- const CALC_HASH='25715f0d649f750c59c6c1766cbe8a0228a11578e78724122d5c08e815c6203e', REF_HASH='d9dfffc623652bc03e3212c278c40549145234c33d95173e18d9c91cbe9f39e2', VERSION='approved-20261009-622952a27038';
+ const CALC_HASH='25715f0d649f750c59c6c1766cbe8a0228a11578e78724122d5c08e815c6203e', REF_HASH='d9dfffc623652bc03e3212c278c40549145234c33d95173e18d9c91cbe9f39e2', VERSION='approved-20261009-622952a27038', BTU_HASH='ce3e9188b6921d44c4296461bbdf74f48f876546dc6f8638ff183befebb5ed2f';
  let registration, verified=false, reloading=false, checkingUpdate=false, lastUpdateCheck=0;
  const $=id=>document.getElementById(id), tools=$('tools');
  const digest=async bytes=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(n=>n.toString(16).padStart(2,'0')).join('');
@@ -20,10 +20,15 @@
  async function start(){
   block('Checking calculator and reference integrity…');connection();
   try{
-   const [bytes,refs]=await Promise.all([asset('calculator.js',CALC_HASH),asset('reference.json',REF_HASH)]);
+   const [bytes,refs,btuBytes]=await Promise.all([asset('calculator.js',CALC_HASH),asset('reference.json',REF_HASH),asset('btu-runtime.js',BTU_HASH)]);
    const reference=JSON.parse(new TextDecoder().decode(refs));if(reference.version!==VERSION||reference.calculationSHA256!==CALC_HASH)throw Error('Reference version mismatch');
    const script=document.createElement('script'),url=URL.createObjectURL(new Blob([bytes],{type:'application/javascript'}));script.src=url;
    await new Promise((resolve,reject)=>{script.onload=resolve;script.onerror=()=>reject(Error('Calculator could not start'));document.head.appendChild(script);});URL.revokeObjectURL(url);
+   // Execute exactly the hashed bytes; a load event alone does not prove a successful mount.
+   const btuScript=document.createElement('script'),btuURL=URL.createObjectURL(new Blob([btuBytes],{type:'application/javascript'}));let btuMounted=false;btuScript.src=btuURL;
+   btuScript.__stagBTUMounted=()=>{btuMounted=true;};
+   try{await new Promise((resolve,reject)=>{btuScript.onload=()=>btuMounted?resolve():reject(Error('Radiator BTU calculator did not mount'));btuScript.onerror=()=>reject(Error('Radiator BTU calculator could not start'));document.head.appendChild(btuScript);});}
+   finally{URL.revokeObjectURL(btuURL);delete btuScript.__stagBTUMounted;}
    verified=true;tools.disabled=false;tools.inert=false;$('appAlert').hidden=true;
    if(!('serviceWorker' in navigator)||!window.isSecureContext){$('readiness').textContent='Offline installation unavailable: use Safari over HTTPS.';return;}
    registration=await navigator.serviceWorker.register('sw.js',{scope:'./',updateViaCache:'none'});
@@ -68,6 +73,6 @@
  window.addEventListener('online',()=>{connection();readiness();checkForUpdates(false);});window.addEventListener('offline',()=>{connection();readiness();});
  window.addEventListener('pageshow',()=>{if(verified){verifyLoaded();checkForUpdates(false);}});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&verified){verifyLoaded();checkForUpdates(false);}});
- async function verifyLoaded(){try{await Promise.all([asset('calculator.js',CALC_HASH),asset('reference.json',REF_HASH)]);await readiness();}catch(e){block(e.message+' — reconnect and repair.');}}
+ async function verifyLoaded(){try{await Promise.all([asset('calculator.js',CALC_HASH),asset('reference.json',REF_HASH),asset('btu-runtime.js',BTU_HASH)]);await readiness();}catch(e){block(e.message+' — reconnect and repair.');}}
  start();
 })();
